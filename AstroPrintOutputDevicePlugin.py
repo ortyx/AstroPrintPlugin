@@ -1,5 +1,5 @@
 from UM.OutputDevice.OutputDevicePlugin import OutputDevicePlugin
-from . import OctoPrintOutputDevice
+from . import AstroPrintOutputDevice
 
 from zeroconf import Zeroconf, ServiceBrowser, ServiceStateChange, ServiceInfo
 from UM.Signal import Signal, signalemitter
@@ -11,11 +11,11 @@ import time
 import json
 import re
 
-##      This plugin handles the connection detection & creation of output device objects for OctoPrint-connected printers.
+##      This plugin handles the connection detection & creation of output device objects for AstroPrint-connected printers.
 #       Zero-Conf is used to detect printers, which are saved in a dict.
 #       If we discover an instance that has the same key as the active machine instance a connection is made.
 @signalemitter
-class OctoPrintOutputDevicePlugin(OutputDevicePlugin):
+class AstroPrintOutputDevicePlugin(OutputDevicePlugin):
     def __init__(self):
         super().__init__()
         self._zero_conf = None
@@ -29,16 +29,16 @@ class OctoPrintOutputDevicePlugin(OutputDevicePlugin):
 
         # Load custom instances from preferences
         self._preferences = Preferences.getInstance()
-        self._preferences.addPreference("octoprint/manual_instances", "{}")
+        self._preferences.addPreference("astroprint/manual_instances", "{}")
 
         try:
-            self._manual_instances = json.loads(self._preferences.getValue("octoprint/manual_instances"))
+            self._manual_instances = json.loads(self._preferences.getValue("astroprint/manual_instances"))
         except ValueError:
             self._manual_instances = {}
         if not isinstance(self._manual_instances, dict):
             self._manual_instances = {}
 
-        self._name_regex = re.compile("OctoPrint instance (\".*\"\.|on )(.*)\.")
+        self._name_regex = re.compile("AstroPrint instance (\".*\"\.|on )(.*)\.")
 
     addInstanceSignal = Signal()
     removeInstanceSignal = Signal()
@@ -62,7 +62,7 @@ class OctoPrintOutputDevicePlugin(OutputDevicePlugin):
             Logger.logException("e", "Failed to create Zeroconf instance. Auto-discovery will not work.")
 
         if self._zero_conf:
-            self._browser = ServiceBrowser(self._zero_conf, u'_octoprint._tcp.local.', [self._onServiceChanged])
+            self._browser = ServiceBrowser(self._zero_conf, u'_astroprint._tcp.local.', [self._onServiceChanged])
 
         # Add manual instances from preference
         for name, properties in self._manual_instances.items():
@@ -77,7 +77,7 @@ class OctoPrintOutputDevicePlugin(OutputDevicePlugin):
 
     def addManualInstance(self, name, address, port, path, useHttps = False, userName = "", password = ""):
         self._manual_instances[name] = {"address": address, "port": port, "path": path, "useHttps": useHttps, "userName": userName, "password": password}
-        self._preferences.setValue("octoprint/manual_instances", json.dumps(self._manual_instances))
+        self._preferences.setValue("astroprint/manual_instances", json.dumps(self._manual_instances))
 
         properties = { b"path": path.encode("utf-8"), b"useHttps": b"true" if useHttps else b"false", b'userName': userName.encode("utf-8"), b'password': password.encode("utf-8"), b"manual": b"true" }
 
@@ -94,7 +94,7 @@ class OctoPrintOutputDevicePlugin(OutputDevicePlugin):
 
         if name in self._manual_instances:
             self._manual_instances.pop(name, None)
-            self._preferences.setValue("octoprint/manual_instances", json.dumps(self._manual_instances))
+            self._preferences.setValue("astroprint/manual_instances", json.dumps(self._manual_instances))
 
     ##  Stop looking for devices on network.
     def stop(self):
@@ -112,8 +112,8 @@ class OctoPrintOutputDevicePlugin(OutputDevicePlugin):
             return
 
         for key in self._instances:
-            if key == global_container_stack.getMetaDataEntry("octoprint_id"):
-                self._instances[key].setApiKey(global_container_stack.getMetaDataEntry("octoprint_api_key", ""))
+            if key == global_container_stack.getMetaDataEntry("astroprint_id"):
+                self._instances[key].setApiKey(global_container_stack.getMetaDataEntry("astroprint_api_key", ""))
                 self._instances[key].connectionStateChanged.connect(self._onInstanceConnectionStateChanged)
                 self._instances[key].connect()
             else:
@@ -122,11 +122,11 @@ class OctoPrintOutputDevicePlugin(OutputDevicePlugin):
 
     ##  Because the model needs to be created in the same thread as the QMLEngine, we use a signal.
     def addInstance(self, name, address, port, properties):
-        instance = OctoPrintOutputDevice.OctoPrintOutputDevice(name, address, port, properties)
+        instance = AstroPrintOutputDevice.AstroPrintOutputDevice(name, address, port, properties)
         self._instances[instance.getKey()] = instance
         global_container_stack = Application.getInstance().getGlobalContainerStack()
-        if global_container_stack and instance.getKey() == global_container_stack.getMetaDataEntry("octoprint_id"):
-            instance.setApiKey(global_container_stack.getMetaDataEntry("octoprint_api_key", ""))
+        if global_container_stack and instance.getKey() == global_container_stack.getMetaDataEntry("astroprint_id"):
+            instance.setApiKey(global_container_stack.getMetaDataEntry("astroprint_api_key", ""))
             instance.connectionStateChanged.connect(self._onInstanceConnectionStateChanged)
             instance.connect()
 

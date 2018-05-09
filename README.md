@@ -1,17 +1,20 @@
-# OctoPrintPlugin
-Cura plugin which enables printing directly to OctoPrint and monitoring the progress
+# AstroPrintPlugin
+Cura plugin which enables printing directly to AstroPrint and (limited) monitoring of the progress
 
-This plugin started out as a fork of the UM3NetworkPrinting plugin:
+This plugin started out as a fork of the OctoPrintPlugin
+https://github.com/fieldOfView/OctoPrintPlugin
+
+Which in turn started out as a fork of the UM3NetworkPrinting plugin:
 https://github.com/Ultimaker/UM3NetworkPrintingPlugin
 
 Installation
 ----
 * Manually:
   - Make sure your Cura version is 2.2 or newer
-  - Download or clone the repository into [Cura installation folder]/plugins/OctoPrintPlugin
+  - Download or clone the repository into [Cura installation folder]/plugins/AstroPrintPlugin
     or in the plugins folder inside the configuration folder. The configuration folder can be
     found via Help -> Show Configuration Folder inside Cura.
-    NB: The folder of the plugin itself *must* be ```OctoPrintPlugin```
+    NB: The folder of the plugin itself *must* be ```AstroPrintPlugin```
     NB: Make sure you download the branch that matches the Cura branch (ie: 2.4 for Cura 2.4 etc)
   - If you are running Cura from source, make sure you install python-zeroconf using pip:
     ```pip3 install python3-zeroconf```.
@@ -19,23 +22,23 @@ Installation
 * Cura PPA (*Ubuntu):
   - Add the cura PPA via (if not already done): `sudo add-apt-repository ppa:thopiekar/cura`
   - Update APT via: `sudo apt update`
-  - Install the plugin via: `sudo apt install cura-plugin-octoprint`
+  - Install the plugin via: `sudo apt install cura-plugin-astroprint`
 
 
 How to use
 ----
-- Make sure OctoPrint is up and running, and the discovery plugin is not disabled
-- In Cura, add a Printer matching the 3d printer you have connected to OctoPrint
-- Select "Connect to OctoPrint" on the Manage Printers page.
-- Select your OctoPrint instance from the list and enter the API key which is
-  available in the OctoPrint settings.
+- Make sure AstroPrint is up and running, and the discovery plugin is not disabled
+- In Cura, add a Printer matching the 3d printer you have connected to AstroPrint
+- Select "Connect to AstroPrint" on the Manage Printers page.
+- Select your AstroPrint instance from the list and enter the API key which is
+  available in the AstroPrint settings.
 - From this point on, the print monitor should be functional and you should be
-  able to switch to "Print to Octoprint" on the bottom of the sidebar.
+  able to switch to "Print to AstroPrint" on the bottom of the sidebar.
 
 Notes on UltiGCode (Ultimaker 2/Ultimaker 2+)
 ----
 The Ultimaker 2(+) family uses a flavor of GCode named UltiGCode. Unfortunately printing
 using UltiGCode flavor does not work when printing over the USB connection. That is why
-using OctoPrint does not work with UltiGCode flavor. You can use "Machine Settings" on
+using AstroPrint does not work with UltiGCode flavor. You can use "Machine Settings" on
 the "Printers" pane of the preferences to change your GCode flavor to "RepRap
 (Marlin/Sprinter)".

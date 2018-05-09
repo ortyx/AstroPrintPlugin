@@ -3,8 +3,8 @@
 
 import os, json
 
-from . import OctoPrintOutputDevicePlugin
-from . import DiscoverOctoPrintAction
+from . import AstroPrintOutputDevicePlugin
+from . import DiscoverAstroPrintAction
 
 from UM.Version import Version
 from UM.Application import Application
@@ -16,8 +16,8 @@ def getMetaData():
 def register(app):
     if __matchVersion():
         return {
-	        "output_device": OctoPrintOutputDevicePlugin.OctoPrintOutputDevicePlugin(),
-	        "machine_action": DiscoverOctoPrintAction.DiscoverOctoPrintAction()
+	        "output_device": AstroPrintOutputDevicePlugin.AstroPrintOutputDevicePlugin(),
+	        "machine_action": DiscoverAstroPrintAction.DiscoverAstroPrintAction()
         }
     else:
         Logger.log("w", "Plugin not loaded because of a version mismatch")

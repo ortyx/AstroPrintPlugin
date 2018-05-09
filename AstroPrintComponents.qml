@@ -11,17 +11,17 @@ Item
     id: base
 
     property bool printerConnected: Cura.MachineManager.printerOutputDevices.length != 0
-    property bool octoPrintConnected: printerConnected && Cura.MachineManager.printerOutputDevices[0].hasOwnProperty("octoprintVersion")
+    property bool astroPrintConnected: printerConnected && Cura.MachineManager.printerOutputDevices[0].hasOwnProperty("astroprintVersion")
 
     Button
     {
-        objectName: "openOctoPrintButton"
+        objectName: "openAstroPrintButton"
         height: UM.Theme.getSize("save_button_save_to_button").height
-        tooltip: catalog.i18nc("@info:tooltip", "Open the OctoPrint web interface")
-        text: catalog.i18nc("@action:button", "OctoPrint...")
+        tooltip: catalog.i18nc("@info:tooltip", "Open the AstroPrint web interface")
+        text: catalog.i18nc("@action:button", "AstroPrint...")
         style: UM.Theme.styles.sidebar_action_button
         onClicked: manager.openWebPage(Cura.MachineManager.printerOutputDevices[0].baseURL)
-        visible: octoPrintConnected
+        visible: astroPrintConnected
     }
 
     UM.I18nCatalog{id: catalog; name:"cura"}

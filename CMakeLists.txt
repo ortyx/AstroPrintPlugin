@@ -1,16 +1,16 @@
-project(OctoPrintPlugin NONE)
+project(AstroPrintPlugin NONE)
 cmake_minimum_required(VERSION 2.8.12)
 
 install(FILES
     __init__.py
     plugin.json
-    DiscoverOctoPrintAction.py
-    DiscoverOctoPrintAction.qml
-    OctoPrintComponents.qml
-    OctoPrintOutputDevice.py
-    OctoPrintOutputDevicePlugin.py
+    DiscoverAstroPrintAction.py
+    DiscoverAstroPrintAction.qml
+    AstroPrintComponents.qml
+    AstroPrintOutputDevice.py
+    AstroPrintOutputDevicePlugin.py
     MonitorItem.qml
     LICENSE
     README.md
-    DESTINATION lib/cura/plugins/OctoPrintPlugin
+    DESTINATION lib/cura/plugins/AstroPrintPlugin
 )

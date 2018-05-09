@@ -14,7 +14,7 @@ Cura.MachineAction
     Column
     {
         anchors.fill: parent;
-        id: discoverOctoPrintAction
+        id: discoverAstroPrintAction
 
         spacing: UM.Theme.getSize("default_margin").height
 
@@ -24,7 +24,7 @@ Cura.MachineAction
         {
             id: pageTitle
             width: parent.width
-            text: catalog.i18nc("@title", "Connect to OctoPrint")
+            text: catalog.i18nc("@title", "Connect to AstroPrint")
             wrapMode: Text.WordWrap
             font.pointSize: 18
         }
@@ -34,7 +34,7 @@ Cura.MachineAction
             id: pageDescription
             width: parent.width
             wrapMode: Text.WordWrap
-            text: catalog.i18nc("@label", "Select your OctoPrint instance from the list below:")
+            text: catalog.i18nc("@label", "Select your AstroPrint instance from the list below:")
         }
 
         Row
@@ -181,7 +181,7 @@ Cura.MachineAction
                     {
                         width: Math.floor(parent.width * 0.75)
                         wrapMode: Text.WordWrap
-                        text: base.selectedInstance ? base.selectedInstance.octoprintVersion : ""
+                        text: base.selectedInstance ? base.selectedInstance.astroprintVersion : ""
                     }
                     Label
                     {
@@ -255,7 +255,7 @@ Cura.MachineAction
                         var result = ""
                         if (apiKey.text == "")
                         {
-                            result = catalog.i18nc("@label", "Please enter the API key to access OctoPrint.");
+                            result = catalog.i18nc("@label", "Please enter the API key to access AstroPrint.");
                         }
                         else
                         {
@@ -275,7 +275,7 @@ Cura.MachineAction
                                 return catalog.i18nc("@label", "Checking the API key...")
                             }
                         }
-                        result += " " + catalog.i18nc("@label", "You can get the API key through the OctoPrint web page.");
+                        result += " " + catalog.i18nc("@label", "You can get the API key through the AstroPrint web page.");
                         return result;
                     }
                     width: parent.width - UM.Theme.getSize("default_margin").width
@@ -293,10 +293,10 @@ Cura.MachineAction
                         id: autoPrintCheckBox
                         text: catalog.i18nc("@label", "Automatically start print job after uploading")
                         enabled: manager.instanceApiKeyAccepted
-                        checked: manager.instanceApiKeyAccepted && Cura.ContainerManager.getContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "octoprint_auto_print") != "false"
+                        checked: manager.instanceApiKeyAccepted && Cura.ContainerManager.getContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "astroprint_auto_print") != "false"
                         onClicked:
                         {
-                            manager.setContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "octoprint_auto_print", String(checked))
+                            manager.setContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "astroprint_auto_print", String(checked))
                         }
                     }
                     CheckBox
@@ -304,10 +304,10 @@ Cura.MachineAction
                         id: showCameraCheckBox
                         text: catalog.i18nc("@label", "Show webcam image")
                         enabled: manager.instanceSupportsCamera
-                        checked: manager.instanceApiKeyAccepted && Cura.ContainerManager.getContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "octoprint_show_camera") == "true"
+                        checked: manager.instanceApiKeyAccepted && Cura.ContainerManager.getContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "astroprint_show_camera") == "true"
                         onClicked:
                         {
-                            manager.setContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "octoprint_show_camera", String(checked))
+                            manager.setContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "astroprint_show_camera", String(checked))
                         }
                     }
                     CheckBox
@@ -315,10 +315,10 @@ Cura.MachineAction
                         id: storeOnSdCheckBox
                         text: catalog.i18nc("@label", "Store G-code on the printer SD card")
                         enabled: manager.instanceSupportsSd
-                        checked: manager.instanceApiKeyAccepted && Cura.ContainerManager.getContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "octoprint_store_sd") == "true"
+                        checked: manager.instanceApiKeyAccepted && Cura.ContainerManager.getContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "astroprint_store_sd") == "true"
                         onClicked:
                         {
-                            manager.setContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "octoprint_store_sd", String(checked))
+                            manager.setContainerMetaDataEntry(Cura.MachineManager.activeMachineId, "astroprint_store_sd", String(checked))
                         }
                     }
                     Label
@@ -337,7 +337,7 @@ Cura.MachineAction
                     }
                     Label
                     {
-                        text: catalog.i18nc("@label", "Note: Printing UltiGCode using OctoPrint does not work. Setting Gcode flavor to \"Marlin\" fixes this, but overrides material settings on your printer.")
+                        text: catalog.i18nc("@label", "Note: Printing UltiGCode using AstroPrint does not work. Setting Gcode flavor to \"Marlin\" fixes this, but overrides material settings on your printer.")
                         width: parent.width - UM.Theme.getSize("default_margin").width
                         wrapMode: Text.WordWrap
                         visible: fixGcodeFlavor.visible
@@ -396,7 +396,7 @@ Cura.MachineAction
         property alias userNameText: userNameField.text
         property alias passwordText: passwordField.text
 
-        title: catalog.i18nc("@title:window", "Manually added OctoPrint instance")
+        title: catalog.i18nc("@title:window", "Manually added AstroPrint instance")
 
         minimumWidth: 400 * screenScaleFactor
         minimumHeight: (showAdvancedOptions.checked ? 280 : 160) * screenScaleFactor
@@ -578,7 +578,7 @@ Cura.MachineAction
                 visible: showAdvancedOptions.checked
                 wrapMode: Text.WordWrap
                 width: parent.width
-                text: catalog.i18nc("@label","NB: Only use these options if you access OctoPrint through a reverse proxy.")
+                text: catalog.i18nc("@label","NB: Only use these options if you access AstroPrint through a reverse proxy.")
             }
         }
 

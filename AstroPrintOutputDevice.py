@@ -25,9 +25,9 @@ import base64
 i18n_catalog = i18nCatalog("cura")
 
 
-##  OctoPrint connected (wifi / lan) printer using the OctoPrint API
+##  AstroPrint connected (wifi / lan) printer using the AstroPrint API
 @signalemitter
-class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
+class AstroPrintOutputDevice(NetworkedPrinterOutputDevice):
     def __init__(self, key, address: str, port, properties, parent = None):
         super().__init__(device_id = key, address = address, properties = properties, parent = parent)
 
@@ -43,7 +43,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
         self._auto_print = True
         self._forced_queue = False
 
-        # We start with a single extruder, but update this when we get data from octoprint
+        # We start with a single extruder, but update this when we get data from astroprint
         self._number_of_extruders_set = False
         self._number_of_extruders = 1
 
@@ -62,7 +62,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
         self._user_agent = ("%s/%s %s/%s" % (
             Application.getInstance().getApplicationName(),
             Application.getInstance().getVersion(),
-            "OctoPrintPlugin",
+            "AstroPrintPlugin",
             Application.getInstance().getVersion()
         )).encode()
 
@@ -86,10 +86,10 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
 
         self.setPriority(2) # Make sure the output device gets selected above local file output
         self.setName(key)
-        self.setShortDescription(i18n_catalog.i18nc("@action:button", "Print with OctoPrint"))
-        self.setDescription(i18n_catalog.i18nc("@properties:tooltip", "Print with OctoPrint"))
+        self.setShortDescription(i18n_catalog.i18nc("@action:button", "Print with AstroPrint"))
+        self.setDescription(i18n_catalog.i18nc("@properties:tooltip", "Print with AstroPrint"))
         self.setIconName("print")
-        self.setConnectionText(i18n_catalog.i18nc("@info:status", "Connected to OctoPrint on {0}").format(self._key))
+        self.setConnectionText(i18n_catalog.i18nc("@info:status", "Connected to AstroPrint on {0}").format(self._key))
 
         #   QNetwork manager needs to be created in advance. If we don't it can happen that it doesn't correctly
         #   hook itself into the event loop, which results in events never being fired / done.
@@ -154,7 +154,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
     def getKey(self):
         return self._key
 
-    ##  Set the API key of this OctoPrint instance
+    ##  Set the API key of this AstroPrint instance
     def setApiKey(self, api_key):
         self._api_key = api_key.encode()
 
@@ -165,7 +165,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
 
     ##  Version (as returned from the zeroConf properties)
     @pyqtProperty(str, constant=True)
-    def octoprintVersion(self):
+    def astroprintVersion(self):
         return self._properties.get(b"version", b"").decode("utf-8")
 
     ## IPadress of this instance
@@ -174,7 +174,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
         return self._address
 
     ## IPadress of this instance
-    #  Overridden from NetworkedPrinterOutputDevice because OctoPrint does not
+    #  Overridden from NetworkedPrinterOutputDevice because AstroPrint does not
     #  send the ip address with zeroconf
     @pyqtProperty(str, constant=True)
     def address(self):
@@ -260,9 +260,9 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
         if self._last_response_time and self._last_request_time and not self._connection_state_before_timeout:
             if time_since_last_response > self._response_timeout_time and time_since_last_request <= self._response_timeout_time:
                 # Go into timeout state.
-                Logger.log("d", "We did not receive a response for %s seconds, so it seems OctoPrint is no longer accesible.", time() - self._last_response_time)
+                Logger.log("d", "We did not receive a response for %s seconds, so it seems AstroPrint is no longer accesible.", time() - self._last_response_time)
                 self._connection_state_before_timeout = self._connection_state
-                self._connection_message = Message(i18n_catalog.i18nc("@info:status", "The connection with OctoPrint was lost. Check your network-connections."))
+                self._connection_message = Message(i18n_catalog.i18nc("@info:status", "The connection with AstroPrint was lost. Check your network-connections."))
                 self._connection_message.show()
                 self.setConnectionState(ConnectionState.error)
 
@@ -318,7 +318,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
 
         self._last_response_time = None
         self._setAcceptsCommands(False)
-        self.setConnectionText(i18n_catalog.i18nc("@info:status", "Connecting to OctoPrint on {0}").format(self._key))
+        self.setConnectionText(i18n_catalog.i18nc("@info:status", "Connecting to AstroPrint on {0}").format(self._key))
 
         ## Request 'settings' dump
         self._settings_reply = self._manager.get(self._createApiRequest("settings"))
@@ -356,7 +356,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
             self._progress_message.hide()
             self._progress_message = None
 
-        self._auto_print = parseBool(global_container_stack.getMetaDataEntry("octoprint_auto_print", True))
+        self._auto_print = parseBool(global_container_stack.getMetaDataEntry("astroprint_auto_print", True))
         self._forced_queue = False
 
         if self.activePrinter.state not in ["idle", ""]:
@@ -364,9 +364,9 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
             if self.activePrinter.state == "offline":
                 self._error_message = Message(i18n_catalog.i18nc("@info:status", "The printer is offline. Unable to start a new job."))
             elif self._auto_print:
-                self._error_message = Message(i18n_catalog.i18nc("@info:status", "OctoPrint is busy. Unable to start a new job."))
+                self._error_message = Message(i18n_catalog.i18nc("@info:status", "AstroPrint is busy. Unable to start a new job."))
             else:
-                # allow queueing the job even if OctoPrint is currently busy if autoprinting is disabled
+                # allow queueing the job even if AstroPrint is currently busy if autoprinting is disabled
                 self._error_message = None
 
             if self._error_message:
@@ -394,7 +394,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                 # stopPreheatTimers was added after Cura 3.3 beta
                 pass
 
-        self._progress_message = Message(i18n_catalog.i18nc("@info:status", "Sending data to OctoPrint"), 0, False, -1)
+        self._progress_message = Message(i18n_catalog.i18nc("@info:status", "Sending data to AstroPrint"), 0, False, -1)
         self._progress_message.addAction("Cancel", i18n_catalog.i18nc("@action:button", "Cancel"), None, "")
         self._progress_message.actionTriggered.connect(self._cancelSendGcode)
         self._progress_message.show()
@@ -435,7 +435,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
         self._post_multi_part.append(post_part)
 
         destination = "local"
-        if self._sd_supported and parseBool(Application.getInstance().getGlobalContainerStack().getMetaDataEntry("octoprint_store_sd", False)):
+        if self._sd_supported and parseBool(Application.getInstance().getGlobalContainerStack().getMetaDataEntry("astroprint_store_sd", False)):
             destination = "sdcard"
 
         try:
@@ -446,7 +446,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
 
         except IOError:
             self._progress_message.hide()
-            self._error_message = Message(i18n_catalog.i18nc("@info:status", "Unable to send data to OctoPrint."))
+            self._error_message = Message(i18n_catalog.i18nc("@info:status", "Unable to send data to AstroPrint."))
             self._error_message.show()
         except Exception as e:
             self._progress_message.hide()
@@ -475,12 +475,12 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
     def _sendQueuedGcode(self):
         if self._queued_gcode_commands:
             self._sendCommandToApi("printer/command", self._queued_gcode_commands)
-            Logger.log("d", "Sent gcode command to OctoPrint instance: %s", self._queued_gcode_commands)
+            Logger.log("d", "Sent gcode command to AstroPrint instance: %s", self._queued_gcode_commands)
             self._queued_gcode_commands = []
 
     def _sendJobCommand(self, command):
         self._sendCommandToApi("job", command)
-        Logger.log("d", "Sent job command to OctoPrint instance: %s", command)
+        Logger.log("d", "Sent job command to AstroPrint instance: %s", command)
 
     def _sendCommandToApi(self, end_point, commands):
         command_request = self._createApiRequest(end_point)
@@ -519,20 +519,20 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                 if not self._printers:
                     self._createPrinterList()
 
-                # An OctoPrint instance has a single printer.
+                # An AstroPrint instance has a single printer.
                 printer = self._printers[0]
 
                 if http_status_code == 200:
                     if not self.acceptsCommands:
                         self._setAcceptsCommands(True)
-                        self.setConnectionText(i18n_catalog.i18nc("@info:status", "Connected to OctoPrint on {0}").format(self._key))
+                        self.setConnectionText(i18n_catalog.i18nc("@info:status", "Connected to AstroPrint on {0}").format(self._key))
 
                     if self._connection_state == ConnectionState.connecting:
                         self.setConnectionState(ConnectionState.connected)
                     try:
                         json_data = json.loads(bytes(reply.readAll()).decode("utf-8"))
                     except json.decoder.JSONDecodeError:
-                        Logger.log("w", "Received invalid JSON from octoprint instance.")
+                        Logger.log("w", "Received invalid JSON from astroprint instance.")
                         json_data = {}
 
                     if "temperature" in json_data:
@@ -584,7 +584,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                     printer.updateState("offline")
                     if printer.activePrintJob:
                         printer.activePrintJob.updateState("offline")
-                    self.setConnectionText(i18n_catalog.i18nc("@info:status", "OctoPrint on {0} does not allow access to print").format(self._key))
+                    self.setConnectionText(i18n_catalog.i18nc("@info:status", "AstroPrint on {0} does not allow access to print").format(self._key))
                     pass
                 elif http_status_code == 409:
                     if self._connection_state == ConnectionState.connecting:
@@ -593,7 +593,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                     printer.updateState("offline")
                     if printer.activePrintJob:
                         printer.activePrintJob.updateState("offline")
-                    self.setConnectionText(i18n_catalog.i18nc("@info:status", "The printer connected to OctoPrint on {0} is not operational").format(self._key))
+                    self.setConnectionText(i18n_catalog.i18nc("@info:status", "The printer connected to AstroPrint on {0} is not operational").format(self._key))
                 else:
                     printer.updateState("offline")
                     if printer.activePrintJob:
@@ -609,7 +609,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                     try:
                         json_data = json.loads(bytes(reply.readAll()).decode("utf-8"))
                     except json.decoder.JSONDecodeError:
-                        Logger.log("w", "Received invalid JSON from octoprint instance.")
+                        Logger.log("w", "Received invalid JSON from astroprint instance.")
                         json_data = {}
 
                     if printer.activePrintJob is None:
@@ -649,12 +649,12 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                 else:
                     pass  # TODO: Handle errors
 
-            elif self._api_prefix + "settings" in reply.url().toString():  # OctoPrint settings dump from /settings:
+            elif self._api_prefix + "settings" in reply.url().toString():  # AstroPrint settings dump from /settings:
                 if http_status_code == 200:
                     try:
                         json_data = json.loads(bytes(reply.readAll()).decode("utf-8"))
                     except json.decoder.JSONDecodeError:
-                        Logger.log("w", "Received invalid JSON from octoprint instance.")
+                        Logger.log("w", "Received invalid JSON from astroprint instance.")
                         json_data = {}
 
                     if "feature" in json_data and "sdSupport" in json_data["feature"]:
@@ -678,7 +678,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                             Logger.log("w", "Unusable stream url received: %s", stream_url)
                             self._camera_url = ""
 
-                        Logger.log("d", "Set OctoPrint camera url to %s", self._camera_url)
+                        Logger.log("d", "Set AstroPrint camera url to %s", self._camera_url)
 
                         if "rotate90" in json_data["webcam"]:
                             self._camera_rotation = -90 if json_data["webcam"]["rotate90"] else 0
@@ -697,7 +697,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
         elif reply.operation() == QNetworkAccessManager.PostOperation:
             if self._api_prefix + "files" in reply.url().toString():  # Result from /files command:
                 if http_status_code == 201:
-                    Logger.log("d", "Resource created on OctoPrint instance: %s", reply.header(QNetworkRequest.LocationHeader).toString())
+                    Logger.log("d", "Resource created on AstroPrint instance: %s", reply.header(QNetworkRequest.LocationHeader).toString())
                 else:
                     pass  # TODO: Handle errors
 
@@ -708,28 +708,28 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                     location = reply.header(QNetworkRequest.LocationHeader)
                     if location:
                         file_name = QUrl(reply.header(QNetworkRequest.LocationHeader).toString()).fileName()
-                        message = Message(i18n_catalog.i18nc("@info:status", "Saved to OctoPrint as {0}").format(file_name))
+                        message = Message(i18n_catalog.i18nc("@info:status", "Saved to AstroPrint as {0}").format(file_name))
                     else:
-                        message = Message(i18n_catalog.i18nc("@info:status", "Saved to OctoPrint"))
-                    message.addAction("open_browser", i18n_catalog.i18nc("@action:button", "OctoPrint..."), "globe",
-                                        i18n_catalog.i18nc("@info:tooltip", "Open the OctoPrint web interface"))
+                        message = Message(i18n_catalog.i18nc("@info:status", "Saved to AstroPrint"))
+                    message.addAction("open_browser", i18n_catalog.i18nc("@action:button", "AstroPrint..."), "globe",
+                                        i18n_catalog.i18nc("@info:tooltip", "Open the AstroPrint web interface"))
                     message.actionTriggered.connect(self._onMessageActionTriggered)
                     message.show()
 
             elif self._api_prefix + "job" in reply.url().toString():  # Result from /job command (eg start/pause):
                 if http_status_code == 204:
-                    Logger.log("d", "Octoprint job command accepted")
+                    Logger.log("d", "AstroPrint job command accepted")
                 else:
                     pass  # TODO: Handle errors
 
             elif self._api_prefix + "printer/command" in reply.url().toString():  # Result from /printer/command (gcode statements):
                 if http_status_code == 204:
-                    Logger.log("d", "Octoprint gcode command(s) accepted")
+                    Logger.log("d", "AstroPrint gcode command(s) accepted")
                 else:
                     pass  # TODO: Handle errors
 
         else:
-            Logger.log("d", "OctoPrintOutputDevice got an unhandled operation %s", reply.operation())
+            Logger.log("d", "AstroPrintOutputDevice got an unhandled operation %s", reply.operation())
 
     def _onUploadProgress(self, bytes_sent, bytes_total):
         if bytes_total > 0:
@@ -743,7 +743,7 @@ class OctoPrintOutputDevice(NetworkedPrinterOutputDevice):
                     self._progress_message.setProgress(progress)
             else:
                 self._progress_message.hide()
-                self._progress_message = Message(i18n_catalog.i18nc("@info:status", "Storing data on OctoPrint"), 0, False, -1)
+                self._progress_message = Message(i18n_catalog.i18nc("@info:status", "Storing data on AstroPrint"), 0, False, -1)
                 self._progress_message.show()
         else:
             self._progress_message.setProgress(0)

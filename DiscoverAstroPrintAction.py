@@ -18,11 +18,11 @@ import base64
 
 catalog = i18nCatalog("cura")
 
-class DiscoverOctoPrintAction(MachineAction):
+class DiscoverAstroPrintAction(MachineAction):
     def __init__(self, parent = None):
-        super().__init__("DiscoverOctoPrintAction", catalog.i18nc("@action", "Connect OctoPrint"))
+        super().__init__("DiscoverAstroPrintAction", catalog.i18nc("@action", "Connect AstroPrint"))
 
-        self._qml_url = "DiscoverOctoPrintAction.qml"
+        self._qml_url = "DiscoverAstroPrintAction.qml"
 
         self._network_plugin = None
 
@@ -47,7 +47,7 @@ class DiscoverOctoPrintAction(MachineAction):
         self._user_agent = ("%s/%s %s/%s" % (
             Application.getInstance().getApplicationName(),
             Application.getInstance().getVersion(),
-            "OctoPrintPlugin",
+            "AstroPrintPlugin",
             Application.getInstance().getVersion()
         )).encode()
 
@@ -64,7 +64,7 @@ class DiscoverOctoPrintAction(MachineAction):
     @pyqtSlot()
     def startDiscovery(self):
         if not self._network_plugin:
-            self._network_plugin = Application.getInstance().getOutputDeviceManager().getOutputDevicePlugin("OctoPrintPlugin")
+            self._network_plugin = Application.getInstance().getOutputDeviceManager().getOutputDevicePlugin("AstroPrintPlugin")
             self._network_plugin.addInstanceSignal.connect(self._onInstanceDiscovery)
             self._network_plugin.removeInstanceSignal.connect(self._onInstanceDiscovery)
             self._network_plugin.instanceListChanged.connect(self._onInstanceDiscovery)
@@ -110,10 +110,10 @@ class DiscoverOctoPrintAction(MachineAction):
     def setKey(self, key):
         global_container_stack = Application.getInstance().getGlobalContainerStack()
         if global_container_stack:
-            if "octoprint_id" in global_container_stack.getMetaData():
-                global_container_stack.setMetaDataEntry("octoprint_id", key)
+            if "astroprint_id" in global_container_stack.getMetaData():
+                global_container_stack.setMetaDataEntry("astroprint_id", key)
             else:
-                global_container_stack.addMetaDataEntry("octoprint_id", key)
+                global_container_stack.addMetaDataEntry("astroprint_id", key)
 
         if self._network_plugin:
             # Ensure that the connection states are refreshed.
@@ -124,8 +124,8 @@ class DiscoverOctoPrintAction(MachineAction):
         global_container_stack = Application.getInstance().getGlobalContainerStack()
         if global_container_stack:
             meta_data = global_container_stack.getMetaData()
-            if "octoprint_id" in meta_data:
-                return global_container_stack.getMetaDataEntry("octoprint_id")
+            if "astroprint_id" in meta_data:
+                return global_container_stack.getMetaDataEntry("astroprint_id")
 
         return ""
 
@@ -138,7 +138,7 @@ class DiscoverOctoPrintAction(MachineAction):
         self.selectedInstanceSettingsChanged.emit()
 
         if api_key != "":
-            Logger.log("d", "Trying to access OctoPrint instance at %s with the provided API key." % base_url)
+            Logger.log("d", "Trying to access AstroPrint instance at %s with the provided API key." % base_url)
 
             ## Request 'settings' dump
             url = QUrl(base_url + "api/settings")
@@ -158,10 +158,10 @@ class DiscoverOctoPrintAction(MachineAction):
     def setApiKey(self, api_key):
         global_container_stack = Application.getInstance().getGlobalContainerStack()
         if global_container_stack:
-            if "octoprint_api_key" in global_container_stack.getMetaData():
-                global_container_stack.setMetaDataEntry("octoprint_api_key", api_key)
+            if "astroprint_api_key" in global_container_stack.getMetaData():
+                global_container_stack.setMetaDataEntry("astroprint_api_key", api_key)
             else:
-                global_container_stack.addMetaDataEntry("octoprint_api_key", api_key)
+                global_container_stack.addMetaDataEntry("astroprint_api_key", api_key)
 
         if self._network_plugin:
             # Ensure that the connection states are refreshed.
@@ -175,7 +175,7 @@ class DiscoverOctoPrintAction(MachineAction):
     def apiKey(self):
         global_container_stack = Application.getInstance().getGlobalContainerStack()
         if global_container_stack:
-            return global_container_stack.getMetaDataEntry("octoprint_api_key")
+            return global_container_stack.getMetaDataEntry("astroprint_api_key")
         else:
             return ""
 
@@ -267,15 +267,15 @@ class DiscoverOctoPrintAction(MachineAction):
         QDesktopServices.openUrl(QUrl(url))
 
     def _createAdditionalComponentsView(self):
-        Logger.log("d", "Creating additional ui components for OctoPrint-connected printers.")
+        Logger.log("d", "Creating additional ui components for AstroPrint-connected printers.")
 
-        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "OctoPrintComponents.qml")
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "AstroPrintComponents.qml")
         self._additional_components = Application.getInstance().createQmlComponent(path, {"manager": self})
         if not self._additional_components:
-            Logger.log("w", "Could not create additional components for OctoPrint-connected printers.")
+            Logger.log("w", "Could not create additional components for AstroPrint-connected printers.")
             return
 
-        Application.getInstance().addAdditionalComponent("monitorButtons", self._additional_components.findChild(QObject, "openOctoPrintButton"))
+        Application.getInstance().addAdditionalComponent("monitorButtons", self._additional_components.findChild(QObject, "openAstroPrintButton"))
 
     ##  Handler for all requests that have finished.
     def _onRequestFinished(self, reply):
@@ -286,15 +286,15 @@ class DiscoverOctoPrintAction(MachineAction):
             return
 
         if reply.operation() == QNetworkAccessManager.GetOperation:
-            if "api/settings" in reply.url().toString():  # OctoPrint settings dump from /settings:
+            if "api/settings" in reply.url().toString():  # AstroPrint settings dump from /settings:
                 if http_status_code == 200:
-                    Logger.log("d", "API key accepted by OctoPrint.")
+                    Logger.log("d", "API key accepted by AstroPrint.")
                     self._instance_api_key_accepted = True
 
                     try:
                         json_data = json.loads(bytes(reply.readAll()).decode("utf-8"))
                     except json.decoder.JSONDecodeError:
-                        Logger.log("w", "Received invalid JSON from octoprint instance.")
+                        Logger.log("w", "Received invalid JSON from astroprint instance.")
                         json_data = {}
 
                     if "feature" in json_data and "sdSupport" in json_data["feature"]:
@@ -306,7 +306,7 @@ class DiscoverOctoPrintAction(MachineAction):
                             self._instance_supports_camera = True
 
                 elif http_status_code == 401:
-                    Logger.log("d", "Invalid API key for OctoPrint.")
+                    Logger.log("d", "Invalid API key for AstroPrint.")
                     self._instance_api_key_accepted = False
 
                 self._instance_responded = True
